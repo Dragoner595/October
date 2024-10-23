@@ -72,3 +72,40 @@ classes = list(files_for_class.keys())
 
 print('Num classes:', len(classes))
 print('Num videos for class[0]:', len(files_for_class[classes[0]]))
+
+def select_subset_of_classes(files_for_classes,files_per_class):
+  """ Create a dictionary with the class name and a subset of the files in that class.
+
+    Args:
+      files_for_class: Dictionary of class names (key) and files (values).
+      classes: List of classes.
+      files_per_class: Number of files per class of interest.
+
+    Returns:
+      Dictionary with class as key and list of specified number of video files in that class.
+  """
+  files_subset = dict()
+  for class_name in classes:
+    class_files = files_for_class[class_name]
+    files_subset[class_name] = class_files[:files_per_class]
+
+  return files_subset
+
+def dowload_from_zip(zip_url,to_dir,file_names):
+  """ Download the contents of the zip file from the zip URL.
+
+    Args:
+      zip_url: A URL with a zip file containing data.
+      to_dir: A directory to download data to.
+      file_names: Names of files to download.
+  """
+  with rz.RemoteZip(zip_url) as zip:
+    for fn in tqdm.tqdm(file_names):
+      class_name = get_class(fn)
+      zip.extract(fn,str(to_dir / class_names))
+      unzipped_file = to_dir / class_name / fn
+
+      fn = pathlib.Path(fn).parts[-1]
+      output_file = to_dir / class_name / fn
+      unzipped_file.rename(output_file)
+
